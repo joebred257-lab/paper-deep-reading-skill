@@ -48,6 +48,27 @@ paper-deep-reading/
 
 ## 下载安装
 
+### 如果你本身就在用 Codex
+
+**最简单粗暴的方式，就是直接让 Codex 帮你安装这个 skill。**
+
+你可以直接对 Codex 说：
+
+```text
+请帮我安装这个 skill：
+https://github.com/Eroticoo/paper-deep-reading-skill
+把它安装到我的 Codex skills 目录里，并把需要的 Python 依赖也一起装好。
+```
+
+如果你希望说得更明确一点，也可以这样写：
+
+```text
+请帮我把这个 skill 安装到我的 Codex skills 目录：
+https://github.com/Eroticoo/paper-deep-reading-skill
+这是一个只面向 Windows 的 skill，请同时安装 pymupdf 和 pillow；
+如果环境里需要处理扫描版 PDF，再补 pytesseract。
+```
+
 ### 最推荐的安装方式：直接 clone 到 Codex skills 目录
 
 **这是当前最推荐的安装方式。**
