@@ -1,152 +1,269 @@
-# paper-deep-reading
+# paper-deep-reading-skill
 
-`paper-deep-reading` 是一个面向本地学术 PDF 的 Codex skill，用来做带截图证据的深度精读，并输出适合继续加工或发布的 Markdown 报告。
+`paper-deep-reading` is a Codex skill for reading local academic PDFs deeply and exporting screenshot-backed Markdown reports.
 
-它目前特别适合控制、估计、滤波、观测器设计这类论文，尤其是需要同时处理：
+This repository currently targets **Windows only**. The workflow and helper scripts are written and tested for `PowerShell + Python` on Windows, and the documentation below is written for Windows users first.
 
-- 标题与作者抬头截图
-- 定理、引理、假设、性质、备注等技术链条截图
-- 系统模型公式的 LaTeX 转写
-- 仿真 / 实验部分的对比图、表格与简要说明
-- 最终 `report.md + images/` 交付
+## What this skill does
 
-## 中文介绍
+After installation, Codex can use `$paper-deep-reading` to:
 
-这是一个专门为学术论文精读场景设计的 Codex skill。它的目标不是只做普通摘要，而是从论文原文 PDF 中直接提取技术证据，包括标题抬头、定理、引理、假设、性质、备注、系统模型、仿真图和结果表，并将这些内容组织成一份适合继续修改、发布或沉淀的 `report.md`。
+- read a local academic PDF end to end
+- extract title / author metadata from the source PDF
+- capture source-grounded screenshots for header blocks, theorem chains, algorithms, system models, figures, and tables
+- write a structured Chinese `report.md`
+- keep a local `images/` folder
+- rewrite image links in `report.md` into public CDN URLs
+- run a final self-review so the deliverable is checked before handoff
 
-对于控制方向论文，这个 skill 会特别关注系统公式链条、定理依赖关系、假设条件、仿真对比图以及最终的工程解释。输出结果默认保留 `report.md + images/`，并支持把图片链接重写成 GitHub CDN 或其他公网图床地址，方便后续粘贴到公众号、笔记系统或仓库文档中。
+It is especially useful for:
 
-## English Overview
+- control papers
+- estimation and filtering papers
+- observer-design papers
+- papers with theorem / lemma / assumption / property chains
+- papers where simulation figures matter as much as the derivation
 
-`paper-deep-reading` is a Codex skill for deep reading local academic PDFs and turning them into screenshot-backed Markdown reports. It is designed for users who need more than a plain summary: the skill extracts source-grounded technical evidence directly from the PDF, including the title header, theorem-like blocks, assumptions, properties, remarks, system-model equations, simulation figures, and result tables.
-
-It is especially useful for control, estimation, filtering, and observer-design papers. The skill emphasizes theorem dependency chains, LaTeX transcription of core system equations, comparison-focused simulation analysis, and a final deliverable built around `report.md + images/`. It also supports rewriting image links into public GitHub CDN or other hosted URLs for publishing workflows.
-
-## 仓库结构
+## Repository layout
 
 ```text
 paper-deep-reading-skill/
-├── README.md
-└── paper-deep-reading/
-    ├── SKILL.md
-    ├── openai.yaml
-    ├── agents/openai.yaml
-    ├── references/
-    └── scripts/
++-- README.md
++-- install-windows.ps1
+\-- paper-deep-reading/
+    +-- SKILL.md
+    +-- openai.yaml
+    +-- agents/openai.yaml
+    +-- references/
+    \-- scripts/
 ```
 
-真正的 skill 本体是 `paper-deep-reading/` 这个目录。`README.md` 只是给仓库访问者看的安装和使用说明。
+The actual skill lives in [paper-deep-reading](./paper-deep-reading/).
 
-## 使用前提
+## Windows support statement
 
-- 建议在 macOS 环境下使用
-  原因：截图脚本 `pdf_snapshot.swift` 依赖系统 PDF 渲染能力
-- 已安装 `python3`
-- 已安装 `bash`
-- 可运行 `swift`
-- 有一个可读写的输出目录用于保存 `report.md` 和 `images/`
-- 如果要把图片放到公众号、GitHub CDN 或其他外链环境，最好准备一个公网图床前缀
+This repository is currently maintained for **Windows 10 / Windows 11**.
 
-## 安装方法
+Supported workflow assumptions:
 
-把仓库里的 `paper-deep-reading/` 整个目录复制到本地 Codex skill 目录下即可：
+- shell: `PowerShell 5.1+` or `PowerShell 7+`
+- Python entrypoint: `python` or `py -3`
+- filesystem layout: standard Codex skills directory under `%USERPROFILE%\\.codex\\skills` or `%CODEX_HOME%\\skills`
 
-```bash
-cp -R paper-deep-reading ~/.codex/skills/
+If you are on macOS or Linux, this repository may still be adaptable, but the published installation path in this README is intentionally Windows-specific.
+
+## Requirements for Windows users
+
+### 1. Install Node.js and npm
+
+Codex CLI is distributed through npm, so install a recent Node.js LTS release first.
+
+Recommended baseline:
+
+- Node.js `18+`
+- npm bundled with Node.js
+
+Check:
+
+```powershell
+node --version
+npm --version
 ```
 
-如果你的 Codex 环境使用的是自定义 `CODEX_HOME`，就把它放到：
+### 2. Install Codex CLI
 
-```bash
-$CODEX_HOME/skills/
+Official CLI install command:
+
+```powershell
+npm install -g @openai/codex
 ```
 
-安装完成后，目录应当长这样：
+Then log in:
+
+```powershell
+codex --login
+```
+
+Check:
+
+```powershell
+codex --version
+```
+
+### 3. Install Python
+
+Install Python `3.10+` on Windows and make sure one of these works:
+
+```powershell
+python --version
+```
+
+or
+
+```powershell
+py -3 --version
+```
+
+### 4. Python packages required by this skill
+
+Required:
+
+- `pymupdf`
+- `pillow`
+
+Optional but recommended for scanned PDFs:
+
+- `pytesseract`
+- native `Tesseract OCR` executable installed on Windows
+
+The included installer script will install the Python packages for you.
+
+## One-click install on Windows
+
+If you already have:
+
+- Node.js + npm
+- Codex CLI
+- Python 3.10+
+
+then installation is:
+
+```powershell
+git clone https://github.com/Eroticoo/paper-deep-reading-skill.git
+cd paper-deep-reading-skill
+powershell -ExecutionPolicy Bypass -File .\install-windows.ps1
+```
+
+What the script does:
+
+- finds your Codex skills directory
+- copies `paper-deep-reading/` into the correct place
+- installs `pymupdf` and `pillow`
+- optionally installs `pytesseract` if you ask for it
+- prints the final installed path
+
+If you also want the optional OCR Python package:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 -InstallOptionalOcrDeps
+```
+
+If you want to overwrite an existing installed copy without keeping it:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 -Force
+```
+
+By default, when an older installed copy exists, the script makes a timestamped backup before replacing it.
+
+## Manual install on Windows
+
+If you prefer to install manually:
+
+1. Copy [paper-deep-reading](./paper-deep-reading/) into:
 
 ```text
-~/.codex/skills/paper-deep-reading/
-├── SKILL.md
-├── openai.yaml
-├── agents/openai.yaml
-├── references/
-└── scripts/
+%USERPROFILE%\.codex\skills\
 ```
 
-## 别人怎么用这个 skill
+or, if you use `CODEX_HOME`:
 
-在 Codex 里直接点名调用即可。最稳妥的写法是显式写出 skill 名称。
+```text
+%CODEX_HOME%\skills\
+```
 
-最小用法：
+2. Install Python dependencies:
+
+```powershell
+python -m pip install --upgrade pymupdf pillow
+```
+
+Optional OCR support:
+
+```powershell
+python -m pip install --upgrade pytesseract
+```
+
+3. Verify the skill folder looks like:
+
+```text
+%USERPROFILE%\.codex\skills\paper-deep-reading\
++-- SKILL.md
++-- openai.yaml
++-- agents/openai.yaml
++-- references\
+\-- scripts\
+```
+
+## Optional OCR setup for scanned PDFs
+
+For machine-readable PDFs, `PyMuPDF` text extraction is usually enough.
+
+For scanned PDFs, install both:
+
+1. Windows Tesseract OCR binary
+2. Python package `pytesseract`
+
+This skill treats OCR as a fallback, not as the primary path.
+
+## Smoke test
+
+After installation, you can verify the helper wrapper is available:
+
+```powershell
+cd %USERPROFILE%\.codex\skills\paper-deep-reading
+.\scripts\pdf_tool.ps1
+```
+
+It should print the tool usage instead of failing on missing imports.
+
+## How to call the skill in Codex
+
+Minimal usage:
 
 ```text
 Use $paper-deep-reading to read this local PDF and write a Chinese report.
 ```
 
-更完整的用法：
+A stronger request:
 
 ```text
 Use $paper-deep-reading to read this local PDF, capture the title-author header image,
-explain the technical core with source-grounded screenshots, include comparison figures
-from the simulation section, and save the final result as report.md plus images/.
+explain the technical core with source-grounded screenshots, emphasize the simulation
+figures, and save the result as report.md plus images/.
 ```
 
-如果你已经有固定输出目录，也可以在请求里直接说清楚：
+If you already know the public image prefix:
 
 ```text
-Use $paper-deep-reading to read /path/to/paper.pdf and save the output in /path/to/output-dir.
-Keep report.md and the local images folder.
+Use $paper-deep-reading to read this PDF and rewrite all images in report.md with:
+https://cdn.jsdelivr.net/gh/<owner>/<repo>@<commit>/<slug>/images
 ```
 
-如果你希望最后的 Markdown 直接使用公网图片链接，也可以把图床前缀一并告诉 Codex：
+## Output shape
 
-```text
-Use $paper-deep-reading to read /path/to/paper.pdf.
-Rewrite all images in report.md with this public prefix:
-https://fastly.jsdelivr.net/gh/<owner>/<repo>@<commit>/paper-name/images
-```
-
-## 输出内容
-
-默认输出会保留：
+The final deliverable is centered around:
 
 - `report.md`
 - `images/`
 
-其中 `report.md` 会尽量满足这些特征：
+The generated report is designed to:
 
-- 一级标题使用论文标题的标准学术中文翻译
-- 一级标题下紧跟论文抬头截图
-- 关键词使用尽量自然的中文学术表达
-- 技术核心部分会解释 theorem / lemma / assumption / property / remark 之间的关系
-- 控制类论文会把系统公式转写为 LaTeX
-- 仿真部分优先放多张互补的对比图，并配简洁说明
-- 图片链接最终会改成公网 URL，而不是本地 `images/...`
+- use a standard academic Chinese translation for the title
+- place a title-author header screenshot directly under the `#` heading
+- explain theorem / lemma / assumption dependencies in section `2`
+- write core system equations in LaTeX for control-oriented papers
+- emphasize simulation / experiment evidence with more than one screenshot when the paper supports it
+- rewrite image links into hosted URLs
+- perform a final self-review before handoff
 
-## 适合什么论文
+## Notes for repository users
 
-这个 skill 最适合：
+- This repository is a **skill repository**, not just a single Markdown prompt.
+- The helper scripts under `paper-deep-reading/scripts/` are part of the installation.
+- The current published setup path is intentionally Windows-first.
 
-- 控制理论
-- 状态估计
-- 区间估计
-- 观测器设计
-- 事件触发控制
-- 含 theorem / lemma / assumption / property / remark 结构的论文
+## References
 
-也可以处理没有定理块的论文，但那种情况下它会转去抓：
-
-- 系统模型
-- 算法块
-- 目标函数
-- 框架图
-- 结果图或结果表
-
-## 一个实用建议
-
-如果论文仿真页是双栏排版，而且图很多，最好在请求里明确说：
-
-```text
-Please keep the simulation crops tight and include the main comparison figures plus brief comparative comments.
-```
-
-这样更容易得到你想要的“对比图 + 简要分析”风格。
+- Official Codex CLI repository: https://github.com/openai/codex
+- Skill payload in this repo: [paper-deep-reading](./paper-deep-reading/)

@@ -43,13 +43,13 @@ To keep readability acceptable:
 3. Run one of these:
 
 ```bash
-python3 scripts/render_wechat_paste.py report.md wechat_paste.md --image-url-prefix "<public-prefix>" --rewrite-report-images
+python scripts/render_wechat_paste.py report.md wechat_paste.md --image-url-prefix "<public-prefix>" --rewrite-report-images
 ```
 
 or, if hosting is not ready yet:
 
 ```bash
-python3 scripts/render_wechat_paste.py report.md wechat_paste.md --rewrite-report-images
+python scripts/render_wechat_paste.py report.md wechat_paste.md --rewrite-report-images
 ```
 
 4. Paste `wechat_paste.md` into your WeChat Markdown workflow.

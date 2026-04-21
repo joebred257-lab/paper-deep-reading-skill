@@ -15,7 +15,7 @@ Treat the report as acceptable only if all items below pass.
 - Section `1` explains the problem, the idea origin, and the innovation points.
 - Section `2` contains technical-core screenshots and explanations.
 - Section `3` contains experiment or simulation evidence screenshots and explanations, and its title matches the paper's evidence type rather than defaulting to a setup-heavy label.
-- Section `4` contains exactly three numbered follow-up directions.
+- Section `4` contains exactly three numbered audience-specific items.
 - Section `5` provides a final summary.
 
 ## Screenshot checks
@@ -26,6 +26,9 @@ Treat the report as acceptable only if all items below pass.
 - Each image referenced from `report.md` uses a hosted URL or an explicit `__PUBLIC_IMAGE_PREFIX__` placeholder rather than a local path.
 - Each screenshot is readable without zooming aggressively.
 - When the paper contains multiple complementary comparison figures or a comparison figure plus a summary table, section `3` includes more than one evidence screenshot.
+- Every referenced theorem, lemma, assumption, property, proposition, remark, or algorithm screenshot contains the full target block and does not spill into `Proof`, the next block, or unrelated body text.
+- Every referenced figure or table screenshot contains the full panel plus caption and does not leak into the next figure, next table, or unrelated paragraph text.
+- When multiple candidate crops were generated for the same evidence block, the cleanest acceptable crop is the one referenced from `report.md`.
 
 ## Content checks
 
@@ -41,9 +44,12 @@ Treat the report as acceptable only if all items below pass.
 - If a later theorem explicitly relies on an earlier theorem, the earlier theorem is not skipped merely because the later one looks more advanced.
 - If the report explicitly discusses a `Lemma`, `Assumption`, `Property`, or `Remark`, section `2` includes the corresponding screenshot rather than only a downstream theorem screenshot.
 - The section-3 explanation says what is measured, what baseline or comparison object is used, and what conclusion is justified.
-- The three extension ideas are not trivial rewordings of the original paper.
-- Each extension idea includes a mathematical derivation difficulty label.
-- In section `4`, each extension item is concise: `标题 + 斜体核心想法 + 数学推导难度`, with no separate `说明` field in the default format.
+- Section `4` follows the fixed audience order: `入门者`, `硕博学生`, `教授`.
+- The beginner item says what a newcomer should learn from the paper first and gives one concrete entry direction.
+- The graduate-student item gives one plausible extension or research direction rather than repeating the original contribution.
+- The professor item gives one practical suggestion on how to guide students, scope the problem, or organize the work.
+- Each section-4 item includes a mathematical derivation difficulty label.
+- In section `4`, each item is concise: `对象 + 标题 + 斜体核心建议 + 数学推导难度`, with no separate `说明` field in the default format.
 - The final `report.md` also uses hosted image URLs or an explicit `__PUBLIC_IMAGE_PREFIX__` placeholder rather than local `images/...` paths.
 - Longer formulas are broken onto separate lines with `$$...$$` rather than being forced into narrow inline layout.
 
@@ -53,4 +59,10 @@ If the report fails:
 
 1. Fix structure first.
 2. Fix screenshot coverage second.
-3. Tighten the explanations and extension ideas last.
+3. Tighten the explanations and section-4 audience-specific advice last.
+
+## Final self-review
+
+- Re-run the checklist after the final public image URLs are written into `report.md`, not only before URL rewriting.
+- Confirm the final output folder keeps `report.md` and `images/`, while transient helper artifacts such as `source_text.txt`, `report.rendered.md`, and temporary page-cache folders are removed unless the user asked to keep them.
+- Summarize the self-review result in the final user-facing response, including whether `validate_report.py` passed and whether the referenced screenshots meet the standard.

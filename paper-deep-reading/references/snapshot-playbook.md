@@ -50,6 +50,10 @@ Capture the system-model screenshot when it helps orientation, but do not stop t
 
 Use the `generic` preset when the anchor is a method block, equation group, pseudocode block, framework panel, or system-model paragraph. If the crop is close but still includes too much unrelated text, switch to `snapshot-rect --preset exact`.
 
+For `Algorithm` anchors, prefer the algorithm block heading itself rather than a prose mention such as "summarised in Algorithm 2".
+When `find "Algorithm n"` returns both an inline mention and a `pdf-block` hit, use the `pdf-block` result or rerun with the full heading line such as `Algorithm 2 Online BDPC`.
+The current Windows helper prioritizes block-heading matches before inline text matches, but still inspect the `find` output when an algorithm screenshot looks suspiciously small or text-heavy.
+
 ## Section-3 anchors
 
 Search these keywords in order:
@@ -75,6 +79,8 @@ If the paper uses a double-column layout and the wide crop pulls in the neighbor
 - `table`: keep a titled table inside its column when the title sits above the table body
 - `exact`: manually specify the final rectangle with `snapshot-rect`
 
+If `figure-column` still leaves a page header fragment, gutter residue, or a sliver of the neighboring column, render the full page first with `render-page`, inspect the exact bounds, and then recrop with `snapshot-rect --preset exact`.
+
 For tables or mixed comparison panels, start with `table` or `exact`. Use `exact` when row labels, legends, or boundary lines are being cut off.
 
 ## Recropping rules
@@ -91,6 +97,7 @@ Recrop the image if any of these happen:
 - The caption line or table title is missing and the evidence becomes hard to reference.
 
 If the automatic preset is close but not sufficient, switch to `snapshot-rect --preset exact` and crop the region manually using the coordinates reported by `find`.
+For algorithm blocks in particular, `render-page` plus `snapshot-rect --preset exact` is the preferred fallback when the crop still includes the paragraph above the block or the next section heading below it.
 
 ## Suggested naming
 
