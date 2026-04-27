@@ -1,4 +1,4 @@
 interface:
   display_name: "Paper Deep Reading"
-  short_description: "Read PDFs, capture technical evidence, and write a polished report with audience-specific section-4 advice."
-  default_prompt: "Use $paper-deep-reading to read this local PDF, place the title-author header image under the report title, explain the technical core with key source-grounded screenshots, include multiple comparison figures in the simulation or experiment section when the paper provides them, and write section 4 as three numbered items for beginners, master's or PhD students, and professors while keeping the local images folder."
+  short_description: "Read PDFs, capture technical evidence, and write a polished report with local-preview image links by default."
+  default_prompt: "Use $paper-deep-reading to read this local PDF, place the title-author header image under the report title, explain the technical core with key source-grounded screenshots, include multiple comparison figures in the simulation or experiment section when the paper provides them, and write section 4 as three numbered items for beginners, master's or PhD students, and professors while keeping report.md image links as local relative paths (./images/...)."
